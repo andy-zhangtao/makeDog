@@ -52,7 +52,13 @@ func main() {
 		os.Exit(-1)
 	}
 
-	t.Execute(file, mf)
+	err = t.Execute(file, mf)
+	if err != nil{
+		fmt.Println(err)
+		os.Exit(-1)
+	}
+
+	fmt.Println("MakeDog Finish! Wang~ Wang~")
 }
 
 func getVersion() string {
