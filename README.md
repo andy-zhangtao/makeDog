@@ -16,7 +16,7 @@ The default makefile content is :
 name = {{Name}}
 
 build:
-	go build -ldflags "-X main._VERSION_=$(shell date +%Y%m%d)" -o $(name)
+	go build -ldflags "-X main._VERSION_=$(shell date +%Y%m%d-%H%M%S)" -o $(name)
 
 run: build
 	./$(name)
