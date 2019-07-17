@@ -3,22 +3,24 @@ package main
 import (
 	"flag"
 	"fmt"
-	"text/template"
 	"os"
+	"text/template"
 )
 
 const makefileWithDocker = `
 .PHONY: build
 name = {{.Name}}
+version = $(shell date +%Y%m%d-%H%M%S)
 
 build:
-	go build -ldflags "-X main._VERSION_=$(shell date +%Y%m%d-%H%M%S)" -o $(name)
+	go build -ldflags "-X main._VERSION_=$(version)" -o $(name)
 
 run: build
 	./$(name)
 
 release: *.go *.md
-	GOOS=linux GOARCH=amd64 go build -ldflags "-X main._VERSION_=$(shell date +%Y%m%d)" -a -o $(name)
+	git rev-parse --short HEAD~2|xargs git rev-list --format=%B --max-count=1|xargs echo ` + "`date`" + `  > build.info
+	docker run -it --rm --name golang -e GOOS=linux -e GOARCH=amd64 -v $(PWD):/go/src/dest -w /go/src/dest golang:1.12-alpine go build -ldflags "-X main._VERSION_=$(shell date +%Y%m%d)" -a -o bin/$(name)
 	docker build -t vikings/$(name) .
 	docker push vikings/$(name)
 `
@@ -58,7 +60,7 @@ func main() {
 		fmt.Println(getVersion())
 		os.Exit(0)
 	}
-	
+
 	if *name == "" {
 		fmt.Println("Name can't be empty! See MakeDog Usage below\n")
 		flag.Usage()
