@@ -20,9 +20,9 @@ run: build
 
 release: *.go *.md
 	git rev-parse --short HEAD~2|xargs git rev-list --format=%B --max-count=1|xargs echo ` + "`date`" + `  > build.info
-	docker run -it --rm --name golang -e GOOS=linux -e GOARCH=amd64 -v $(PWD):/go/src/dest -w /go/src/dest golang:1.12-alpine go build -ldflags "-X main._VERSION_=$(shell date +%Y%m%d)" -a -o bin/$(name)
-	docker build -t vikings/$(name) .
-	docker push vikings/$(name)
+	docker run -it --rm --name golang -e GOOS=linux -e GOARCH=amd64 -v $(PWD):/go/src/$(name) -w /go/src/$(name) vikings/golang-1.13-gcc go build -ldflags "-X main._VERSION_=$(shell date +%Y%m%d)" -a -o bin/$(name)
+	docker build -t vikings/$(name):$(version) .
+	docker push vikings/$(name):$(version)
 `
 const makefileWithBinary = `
 .PHONY: build
